@@ -11,7 +11,17 @@ flowchart TB
         A21[9421 system assembly DWG]
         A24[9424 system assembly DWG]
         AX[Other system assembly DWG]
-        TOTAL[Total assembly DWG]
+        N21[9421.nwc · one NWC for system 9421]
+        N24[9424.nwc · one NWC for system 9424]
+        NX[One separate NWC for each other system]
+    end
+    subgraph DELIVERY[ACC / Forma · uploaded NWC files]
+        R21[Uploaded 9421 NWC]
+        R24[Uploaded 9424 NWC]
+        RX[Uploaded NWC for each other system]
+    end
+    subgraph FEDERATION[Cloud / non-local project coordination]
+        TOTAL[Total federated model · assembled from system NWC files]
     end
     C21 -->|Pull| X21
     C24 -->|Pull| X24
@@ -19,12 +29,12 @@ flowchart TB
     X21 -->|Xref / federate| A21
     X24 -->|Xref / federate| A24
     XX -->|Xref / federate| AX
-    A21 -->|Xref| TOTAL
-    A24 -->|Xref| TOTAL
-    AX -->|Xref| TOTAL
-    A21 -->|Native export| N21[9421.nwc · one NWC for system 9421]
-    A24 -->|Native export| N24[9424.nwc · one NWC for system 9424]
-    AX -->|Native export per system| NX[One separate NWC for each other system]
-    N21 -->|Upload · currently manual| DELIVERY[ACC / Forma · separate NWC files per system]
-    N24 -->|Upload · currently manual| DELIVERY
-    NX -->|Upload · currently manual| DELIVERY
+    A21 -->|Native export| N21
+    A24 -->|Native export| N24
+    AX -->|Native export per system| NX
+    N21 -->|Upload · currently manual| R21
+    N24 -->|Upload · currently manual| R24
+    NX -->|Upload · currently manual| RX
+    R21 -->|Federate NWC| TOTAL
+    R24 -->|Federate NWC| TOTAL
+    RX -->|Federate NWC| TOTAL

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1160" viewBox="0 0 1440 1160" role="img" aria-labelledby="title desc">
   <title id="title">Plant 3D Auto sync: from cloud Xrefs to system and Total federated models</title>
-  <desc id="desc">Published DWGs in each cloud system folder are pulled to local Xref folders. Each system assembly DWG references its local sources and exports its own separate NWC for cloud delivery. A separate branch places the system assembly DWGs in Total DWG using Xrefs. Total does not reference NWC files, and there is no Total NWC export in this workflow. Upload is currently manual.</desc>
+  <desc id="desc">Published DWGs in each cloud system folder are pulled to local Xref folders. Each local system assembly DWG references its local sources and exports its own separate NWC. The system NWC files are uploaded and then federated into the cloud or non-local Total model. Total is not a local DWG assembly and its inputs are NWC files, not system DWG files. Upload is currently manual.</desc>
   <defs>
     <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#3268bf"/></marker>
     <style>
@@ -10,7 +10,7 @@
   </defs>
   <rect width="1440" height="1160" rx="20" fill="#f4f7fb"/>
   <text x="48" y="47" class="title">Auto sync · Plant 3D federated-model file flow</text>
-  <text x="48" y="78" class="small">Each system exports its own NWC. Total DWG separately references the system assembly DWGs.</text>
+  <text x="48" y="78" class="small">Cloud DWG → local system DWG → one NWC per system → upload → cloud / non-local Total federation</text>
   <rect x="40" y="103" width="1360" height="155" rx="14" fill="#eaf1fc"/>
   <text x="60" y="137" class="section">1  ACC / Forma · published source DWG by system and floor</text>
   <rect class="node" x="80" y="159" width="320" height="74" rx="10"/>
@@ -41,10 +41,10 @@
   <rect x="80" y="830" width="320" height="75" rx="10" fill="#eaf1fc"/><text x="100" y="860" class="bold">ACC / Forma · 9421 NWC</text><text x="100" y="886" class="small">Cloud delivery file</text>
   <rect x="560" y="830" width="320" height="75" rx="10" fill="#eaf1fc"/><text x="580" y="860" class="bold">ACC / Forma · 9424 NWC</text><text x="580" y="886" class="small">Cloud delivery file</text>
   <rect x="1040" y="830" width="320" height="75" rx="10" fill="#eaf1fc"/><text x="1060" y="860" class="bold">ACC / Forma · system NWC</text><text x="1060" y="886" class="small">Separate file for each system</text>
-  <path class="bus" d="M400 549H440V945H1380V549H1360M880 549H920V945"/>
-  <text x="452" y="616" class="small">DWG Xref</text><text x="932" y="616" class="small">DWG Xref</text>
+  <path class="bus" d="M240 905V945H1200V905M720 905V945"/>
+  <text x="276" y="933" class="small">Uploaded system NWC files</text>
   <path class="edge" d="M720 945V982"/>
-  <rect class="main" x="490" y="990" width="460" height="95" rx="12"/><text x="512" y="1023" class="section">Total assembly DWG · local federation</text><text x="512" y="1052" class="small">Places the system assembly DWGs as Xrefs</text><text x="512" y="1074" class="small">No NWC input or Total NWC export in this flow</text>
-  <text x="48" y="1121" class="small">Two branches from each system DWG: export its NWC for delivery, and place the DWG in Total.</text>
+  <rect class="main" x="440" y="990" width="560" height="95" rx="12"/><text x="462" y="1023" class="section">Total federated model · cloud / non-local</text><text x="462" y="1052" class="small">Assembled from the uploaded NWC of each system</text><text x="462" y="1074" class="small">NWC inputs · not a local system-DWG assembly</text>
+  <text x="48" y="1121" class="small">Local federation uses DWG Xrefs. Total federation uses the uploaded per-system NWC files, outside the local Plant workspace.</text>
   <text x="48" y="1145" class="small">Local NWC output: YYYY-MM-DD folder. Upload is currently manual; automatic NWC Push is not implemented.</text>
 </svg>
