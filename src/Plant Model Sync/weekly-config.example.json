@@ -1,0 +1,12 @@
+{
+  "SettingsPath": "C:\\Users\\YOUR_USER\\AppData\\Local\\IWMF\\PlantModelSync\\settings.json",
+  "Storage": "C:\\Users\\YOUR_USER\\AppData\\Local\\IWMF\\PlantModelSync",
+  "OutputRoot": "D:\\PlantProject\\NWC TO UPLOAD",
+  "Engine": "Plant3D",
+  "ShowWindow": true,
+  "ExpectedLocalModelsRoot": "D:\\PlantProject\\Models",
+  "ExpectedScopeFolder": "D:\\PlantProject\\Models\\单系统总装文件",
+  "ExpectedConnectorRoot": "C:\\Users\\YOUR_USER\\DC\\ACCDocs\\YOUR_ACCOUNT\\YOUR_PROJECT\\Project Files\\Plant 3D Models",
+  "LegacyConnectorRoots": [],
+  "TrustedRepairReceipts": []
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationPackage SchemaVersion="1.0" AutodeskProduct="AutoCAD" Name="IWMF Plant Model Sync" AppVersion="0.4.15" ProductCode="{9A91E8D7-FCA2-4B67-82D5-0D83C42E24AA}" UpgradeCode="{4BA2DFD3-80E8-4A87-BBF6-927F379DD5A4}">
+  <CompanyDetails Name="IWMF" />
+  <Components>
+    <RuntimeRequirements OS="Win64" Platform="AutoCAD*" SeriesMin="R24.3" SeriesMax="R24.3" />
+    <ComponentEntry AppName="IWMF.PlantModelSync" ModuleName="./Contents/IWMF.PlantModelSync.dll" AppDescription="Cloud DWG Pull, affected assembly Xref update review, and native batch NWC export" LoadOnCommandInvocation="True">
+      <Commands GroupName="IWMF_PLANT_SYNC"><Command Global="SYNC" Local="SYNC" /><Command Global="PMSWEEKLYRUN" Local="PMSWEEKLYRUN" /></Commands>
+    </ComponentEntry>
+  </Components>
+</ApplicationPackage>

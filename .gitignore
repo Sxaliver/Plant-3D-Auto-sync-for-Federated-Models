@@ -1,0 +1,27 @@
+# 编译结果、隔离验证和真实项目数据不得进入公开仓库。
+**/bin/
+**/obj/
+**/artifacts/
+**/Demos/
+.vs/
+*.user
+*.suo
+*.dwg
+*.dwl
+*.dwl2
+*.nwc
+*.nwd
+*.nwf
+*.bak
+*.log
+**/Logs/
+**/WeeklyRuns/
+weekly-config.json
+settings.json
+*settings-snapshot*.json
+*.pfx
+*.pem
+*.key
+.env
+.env.*
+!.env.example

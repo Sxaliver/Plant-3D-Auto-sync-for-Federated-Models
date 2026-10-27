@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Plant 3D Auto sync: from cloud Xrefs to system and Total federated models</title>
+  <desc id="desc">Published DWGs in each cloud system folder are pulled to local Xref folders. Each system DWG federates its local sources. The Total DWG references the system DWGs. Native exports produce system NWC files and a Total NWC, which are then uploaded. Upload is currently manual.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#3268bf"/></marker>
+    <style>
+      text{font-family:Segoe UI,Arial,sans-serif;fill:#19324c;font-size:19px}
+      .title{font-size:30px;font-weight:700}.section{font-size:21px;font-weight:700}.node{fill:white;stroke:#c4d2e4;stroke-width:1.4}.main{fill:#e5efff;stroke:#3268bf;stroke-width:1.8}.small{font-size:16px;fill:#4b627c}.bold{font-weight:600}.edge{fill:none;stroke:#3268bf;stroke-width:2.3;marker-end:url(#arrow)}.bus{fill:none;stroke:#3268bf;stroke-width:2.3}
+    </style>
+  </defs>
+  <rect width="1440" height="1000" rx="20" fill="#f4f7fb"/>
+  <text x="48" y="47" class="title">Auto sync · Plant 3D federated-model file flow</text>
+  <text x="48" y="78" class="small">Cloud DWG → local Xref → system assembly → Total assembly → NWC delivery</text>
+  <rect x="40" y="103" width="1360" height="155" rx="14" fill="#eaf1fc"/>
+  <text x="60" y="137" class="section">1  ACC / Forma · published source DWG by system and floor</text>
+  <rect class="node" x="80" y="159" width="320" height="74" rx="10"/>
+  <text x="100" y="187" class="bold">9421 system folder</text><text x="100" y="214" class="small">Floor / equipment / piping DWG</text>
+  <rect class="node" x="560" y="159" width="320" height="74" rx="10"/>
+  <text x="580" y="187" class="bold">9424 · Gypsum dewatering</text><text x="580" y="214" class="small">EL+5.30 / EL+16.40 / GDS_PIPING</text>
+  <rect class="node" x="1040" y="159" width="320" height="74" rx="10"/>
+  <text x="1060" y="187" class="bold">Other configured systems</text><text x="1060" y="214" class="small">9422, 9423, 9425–9429, 9431</text>
+  <path class="edge" d="M240 234V297"/><path class="edge" d="M720 234V297"/><path class="edge" d="M1200 234V297"/>
+  <text x="252" y="283" class="bold">Pull</text><text x="732" y="283" class="bold">Pull</text><text x="1212" y="283" class="bold">Pull</text>
+  <rect x="40" y="305" width="1360" height="323" rx="14" fill="#edf5f2"/>
+  <text x="60" y="332" class="section">2  Local workspace · download sources, then federate each system</text>
+  <rect class="node" x="80" y="350" width="320" height="74" rx="10"/><text x="100" y="379" class="bold">local_9421 / *.dwg</text><text x="100" y="405" class="small">Local source Xrefs</text>
+  <rect class="node" x="560" y="350" width="320" height="74" rx="10"/><text x="580" y="379" class="bold">local_9424 / *.dwg</text><text x="580" y="405" class="small">Local source Xrefs</text>
+  <rect class="node" x="1040" y="350" width="320" height="74" rx="10"/><text x="1060" y="379" class="bold">local_[system] / *.dwg</text><text x="1060" y="405" class="small">Local source Xrefs</text>
+  <path class="edge" d="M240 424V500"/><path class="edge" d="M720 424V500"/><path class="edge" d="M1200 424V500"/>
+  <text x="255" y="468" class="small">Xref / federate</text><text x="735" y="468" class="small">Xref / federate</text><text x="1215" y="468" class="small">Xref / federate</text>
+  <rect class="main" x="80" y="505" width="320" height="88" rx="10"/><text x="100" y="538" class="bold">9421 system assembly DWG</text><text x="100" y="568" class="small">References local 9421 sources</text>
+  <rect class="main" x="560" y="505" width="320" height="88" rx="10"/><text x="580" y="538" class="bold">9424 system assembly DWG</text><text x="580" y="568" class="small">References local 9424 sources</text>
+  <rect class="main" x="1040" y="505" width="320" height="88" rx="10"/><text x="1060" y="538" class="bold">Other system assembly DWG</text><text x="1060" y="568" class="small">References its local sources</text>
+  <path class="bus" d="M240 594V650H1200V594M720 594V650"/>
+  <path class="edge" d="M720 650V711"/><text x="741" y="687" class="small">Xref system DWGs</text>
+  <path class="edge" d="M240 650V711"/><text x="52" y="687" class="small">Native export</text>
+  <rect class="node" x="70" y="718" width="340" height="92" rx="12"/><text x="92" y="750" class="bold">System NWC deliverables</text><text x="92" y="780" class="small">9421.nwc / 9424.nwc / …</text>
+  <rect class="main" x="530" y="718" width="380" height="92" rx="12"/><text x="552" y="750" class="section">3  Total assembly DWG</text><text x="552" y="780" class="small">Process after the system assemblies</text>
+  <path class="edge" d="M910 764H1032"/><text x="927" y="744" class="small">Native export</text>
+  <rect class="node" x="1040" y="718" width="320" height="92" rx="12"/><text x="1062" y="751" class="bold">Total.nwc</text><text x="1062" y="780" class="small">Local YYYY-MM-DD output folder</text>
+  <path class="edge" d="M240 811V884"/><path class="edge" d="M1200 811V884"/>
+  <text x="255" y="854" class="small">Upload</text><text x="1215" y="854" class="small">Upload</text>
+  <rect x="70" y="892" width="1290" height="63" rx="12" fill="#e5efff" stroke="#b7cbe7"/>
+  <text x="92" y="921" class="section">4  ACC / Forma · NWC delivery folder</text><text x="92" y="945" class="small">Current upload: manual. Automatic NWC Push and full Total orchestration are integration goals.</text>
+  <text x="48" y="983" class="small">Cloud DWG becomes a LOCAL Xref. Total references SYSTEM DWGs, not NWC files. Diagram shows the target dependency flow.</text>
+</svg>

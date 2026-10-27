@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>10.0</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>IWMF.PlantModelSync</AssemblyName>
+    <Version>0.4.15</Version>
+    <AutoCADDir Condition="'$(AutoCADDir)' == ''">C:\Program Files\Autodesk\AutoCAD 2024</AutoCADDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Tests\**;artifacts\**;ApsClient.cs;Authentication.cs" />
+    <Compile Remove="HostSmoke.cs" Condition="'$(IncludeHostTests)' != 'true'" />
+    <Compile Remove="NewCloudFilesSmoke.cs" Condition="'$(IncludeHostTests)' != 'true'" />
+    <Compile Remove="ReferenceScopeSmoke.cs" Condition="'$(IncludeHostTests)' != 'true'" />
+    <Compile Remove="ReferenceNameSmoke.cs" Condition="'$(IncludeHostTests)' != 'true'" />
+    <Compile Remove="ReferencePairAuditSmoke.cs" Condition="'$(IncludeHostTests)' != 'true'" />
+    <Compile Include="..\Shared\ModernUi.cs" Link="Shared\ModernUi.cs" />
+    <Compile Include="..\Shared\Core\ReviewData.cs" Link="Shared\ReviewData.cs" />
+    <Reference Include="AcCoreMgd"><HintPath>$(AutoCADDir)\AcCoreMgd.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="AcDbMgd"><HintPath>$(AutoCADDir)\AcDbMgd.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="AcMgd"><HintPath>$(AutoCADDir)\AcMgd.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="PnPProjectManagerMgd"><HintPath>$(AutoCADDir)\PLNT3D\PnPProjectManagerMgd.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="PnP3dProjectPartsMgd"><HintPath>$(AutoCADDir)\PLNT3D\PnP3dProjectPartsMgd.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="PnIDProjectPartsMgd"><HintPath>$(AutoCADDir)\PLNT3D\PnIdProjectPartsMgd.dll</HintPath><Private>false</Private></Reference>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>

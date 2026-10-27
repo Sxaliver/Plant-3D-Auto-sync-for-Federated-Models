@@ -1,0 +1,30 @@
+flowchart TB
+    subgraph CLOUD[ACC / Forma · Published DWG by system and floor]
+        C21[9421 · floor / equipment / piping DWG]
+        C24[9424 · floor / equipment / piping DWG]
+        CX[Other configured systems in 9421–9431]
+    end
+    subgraph LOCAL[Local Plant 3D workspace]
+        X21[local_9421 · source Xref DWG]
+        X24[local_9424 · source Xref DWG]
+        XX[Other systems · source Xref DWG]
+        A21[9421 system assembly DWG]
+        A24[9424 system assembly DWG]
+        AX[Other system assembly DWG]
+        TOTAL[Total assembly DWG]
+    end
+    C21 -->|Pull| X21
+    C24 -->|Pull| X24
+    CX -->|Pull| XX
+    X21 -->|Xref / federate| A21
+    X24 -->|Xref / federate| A24
+    XX -->|Xref / federate| AX
+    A21 -->|Xref| TOTAL
+    A24 -->|Xref| TOTAL
+    AX -->|Xref| TOTAL
+    A21 -->|Native export| SYSTEMNWC[System NWC deliverables]
+    A24 -->|Native export| SYSTEMNWC
+    AX -->|Native export| SYSTEMNWC
+    TOTAL -->|Native export| TOTALNWC[Total.nwc]
+    SYSTEMNWC -->|Upload · currently manual| DELIVERY[ACC / Forma · NWC delivery folder]
+    TOTALNWC -->|Upload · currently manual| DELIVERY

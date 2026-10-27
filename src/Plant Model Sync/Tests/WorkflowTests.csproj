@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup><TargetFramework>net48</TargetFramework><OutputType>Exe</OutputType><UseWindowsForms>true</UseWindowsForms><LangVersion>10.0</LangVersion><PlatformTarget>x64</PlatformTarget><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="WorkflowTests.cs" />
+    <Compile Include="SystemWorkflowTests.cs" />
+    <Compile Include="LayoutWorkflowTests.cs" />
+    <Compile Include="AuditTests.cs" />
+    <Compile Include="NewCloudFilesTests.cs" />
+    <Compile Include="OneClickTests.cs" />
+    <Compile Include="ManualExportTests.cs" />
+    <Compile Include="WeeklyTests.cs" />
+    <Compile Include="FileNameDisplayTests.cs" />
+    <Compile Include="AssemblyNwcReviewTests.cs" />
+    <Compile Include="NwcTimestampTests.cs" />
+    <Compile Include="CompactUiTests.cs" />
+    <Compile Include="ScanIssuesTests.cs" />
+    <Compile Include="..\ScanIssuesForm.cs" Link="ScanIssuesForm.cs" />
+    <Compile Include="..\VisibleSelectionHeader.cs" Link="VisibleSelectionHeader.cs" />
+    <Compile Include="..\LocalAssemblyCheck.cs" Link="LocalAssemblyCheck.cs" />
+    <Compile Include="..\NwcTimestampCompare.cs" Link="NwcTimestampCompare.cs" />
+    <Compile Include="..\NwcTimestampCompareForm.cs" Link="NwcTimestampCompareForm.cs" />
+    <Compile Include="..\AssemblyNwcReview.cs" Link="AssemblyNwcReview.cs" />
+    <Compile Include="..\AssemblyNwcReviewForm.cs" Link="AssemblyNwcReviewForm.cs" />
+    <Compile Include="..\WeeklyUpdate.cs" Link="WeeklyUpdate.cs" />
+    <Compile Include="..\ManualNwcExport.cs" Link="ManualNwcExport.cs" />
+    <Compile Include="..\ManualNwcExportForm.cs" Link="ManualNwcExportForm.cs" />
+    <Compile Include="..\WorkflowManualExportForm.cs" Link="WorkflowManualExportForm.cs" />
+    <Compile Include="..\NewCloudFiles.cs" Link="NewCloudFiles.cs" />
+    <Compile Include="..\NewReferenceModels.cs" Link="NewReferenceModels.cs" />
+    <Compile Include="..\AssemblyCatalog.cs" Link="AssemblyCatalog.cs" />
+    <Compile Include="..\OneClickUpdate.cs" Link="OneClickUpdate.cs" />
+    <Compile Include="..\UpdateReports.cs" Link="UpdateReports.cs" />
+    <Compile Include="..\UpdateLogForm.cs" Link="UpdateLogForm.cs" />
+    <Compile Include="..\WorkflowUnifiedForm.cs" Link="WorkflowUnifiedForm.cs" />
+    <Compile Include="..\NewCloudFilesForm.cs" Link="NewCloudFilesForm.cs" />
+    <Compile Include="..\Core.cs" Link="Core.cs" />
+    <Compile Include="..\Workflow.cs" Link="Workflow.cs" />
+    <Compile Include="..\WorkflowForm.cs" Link="WorkflowForm.cs" />
+    <Compile Include="..\WorkflowCompactUi.cs" Link="WorkflowCompactUi.cs" />
+    <Compile Include="..\WorkflowProgress.cs" Link="WorkflowProgress.cs" />
+    <Compile Include="..\AssemblyBrowser.cs" Link="AssemblyBrowser.cs" />
+    <Compile Include="..\AboutForm.cs" Link="AboutForm.cs" />
+    <Compile Include="..\ReferenceDownload.cs" Link="ReferenceDownload.cs" />
+    <Compile Include="..\LocalReferenceAttachment.cs" Link="LocalReferenceAttachment.cs" />
+    <Compile Include="AssemblyBrowserTests.cs" />
+    <Compile Include="AttachmentPolicyTests.cs" />
+    <Compile Include="LocalRepairTests.cs" />
+    <Compile Include="ReferenceScopeTests.cs" />
+    <Compile Include="ReferenceIdentityTests.cs" />
+    <Compile Include="ReferenceCandidateTests.cs" />
+    <Compile Include="ReferencePriorityRefreshTests.cs" />
+    <Compile Include="ReferenceNameTests.cs" />
+    <Compile Include="..\ReferenceComparisonBuilder.cs" Link="ReferenceComparisonBuilder.cs" />
+    <Compile Include="..\ReferenceNamePolicy.cs" Link="ReferenceNamePolicy.cs" />
+    <Compile Include="..\AssemblyReferenceRepair.cs" Link="AssemblyReferenceRepair.cs" />
+    <Compile Include="..\LocalReferenceRepair.cs" Link="LocalReferenceRepair.cs" />
+    <Compile Include="PullDateTests.cs" />
+    <Compile Include="ScanProgressTests.cs" />
+    <Compile Include="..\MainForm.cs" Link="MainForm.cs" />
+    <Compile Include="..\SplitView.cs" Link="SplitView.cs" />
+    <Compile Include="..\TargetFinder.cs" Link="TargetFinder.cs" />
+    <Compile Include="..\SyncService.cs" Link="SyncService.cs" />
+    <Compile Include="..\SyncFeedback.cs" Link="SyncFeedback.cs" />
+    <Compile Include="..\..\Shared\ModernUi.cs" Link="ModernUi.cs" />
+    <Compile Include="..\..\Shared\Core\ReviewData.cs" Link="ReviewData.cs" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="All" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>
