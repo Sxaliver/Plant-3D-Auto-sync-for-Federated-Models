@@ -4,9 +4,9 @@
 
 本地阶段只处理各系统的源 Xref、系统总装 DWG 和对应 NWC 导出。系统总装需要验证实际图纸中的 Attachment / Overlay、卸载状态和跨系统引用，不能只按文件名假定依赖完整。
 
-交付文件是每个系统分别导出的一份 NWC。上传后，由这些系统 NWC 在非本地端组装 Total。Total 不属于本地 DWG 引用树，不引用本地系统 DWG；文档不假定 Total 的具体格式或自动组装机制。
+交付文件是每个系统分别导出的一份 NWC。上传后，各系统在 ACC 中的 NWC 分别汇入最终 Assembly NWC（Total，非本地）。所有最终箭头都是“ACC 系统 NWC → Assembly NWC”，不是“DWG → Assembly DWG”。最终 Assembly NWC 不属于本地 DWG 引用树；具体自动组装机制不是当前插件已实现的功能。
 
-目前提供 `SYNC` 交互流程与 `PMSWEEKLYRUN` 批处理入口。`Run-Weekly.ps1` 不会自行注册 Windows 计划任务，也不会自动上传 NWC；非本地端基于 NWC 的 Total 组装属于后续外部协同环节，不是当前插件已实现的功能。
+目前提供 `SYNC` 交互流程与 `PMSWEEKLYRUN` 批处理入口。`Run-Weekly.ps1` 不会自行注册 Windows 计划任务，也不会自动上传 NWC；由各系统 ACC NWC 组成最终 Assembly NWC 属于后续外部协同环节，不是当前插件已实现的功能。
 
 ## 批处理
 

@@ -16,12 +16,12 @@ flowchart TB
         NX[One separate NWC for each other system]
     end
     subgraph DELIVERY[ACC / Forma · uploaded NWC files]
-        R21[Uploaded 9421 NWC]
-        R24[Uploaded 9424 NWC]
-        RX[Uploaded NWC for each other system]
+        R21[ACC · 9421 NWC]
+        R24[ACC · 9424 NWC]
+        RX[ACC · NWC for each other system]
     end
     subgraph FEDERATION[Cloud / non-local project coordination]
-        TOTAL[Total federated model · assembled from system NWC files]
+        ASSEMBLY_NWC[Final Assembly NWC · Total · non-local]
     end
     C21 -->|Pull| X21
     C24 -->|Pull| X24
@@ -35,6 +35,6 @@ flowchart TB
     N21 -->|Upload · currently manual| R21
     N24 -->|Upload · currently manual| R24
     NX -->|Upload · currently manual| RX
-    R21 -->|Federate NWC| TOTAL
-    R24 -->|Federate NWC| TOTAL
-    RX -->|Federate NWC| TOTAL
+    R21 -->|Assemble NWC| ASSEMBLY_NWC
+    R24 -->|Assemble NWC| ASSEMBLY_NWC
+    RX -->|Assemble NWC| ASSEMBLY_NWC

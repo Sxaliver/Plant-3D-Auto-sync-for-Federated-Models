@@ -1,20 +1,20 @@
 # Plant 3D Auto sync for Federated Models
 
-**云端分楼层 DWG → 本地系统总装 → 每个系统各自导出 NWC → 上传云端 → 由各系统 NWC 组装非本地的 Total 总装。**
+**云端分楼层 DWG → 本地系统总装 → 每个系统各自导出 NWC → 上传 ACC → 各系统 ACC NWC 分别指向最终 Assembly NWC（非本地）。**
 
 Auto sync 是用于 **AutoCAD Plant 3D 2024 / Windows x64** 的本地插件。当前源码版本 **0.4.15**，交互命令 `SYNC`，通过 Desktop Connector 获取云端发布文件，不需要 APS Client ID。
 
 ## 为什么需要 Auto sync
 
-项目的 SO 要求模型按楼层拆分交付，同时还需要各系统的本地总装模型，以及由各系统 NWC 组装的 **非本地 Total 总装**。
+项目的 SO 要求模型按楼层拆分交付，同时还需要各系统的本地总装模型，以及由各系统 ACC NWC 组装的 **最终 Assembly NWC（Total，非本地）**。
 
-如果只有分楼层文件，ACC / Autodesk Forma 与 Desktop Connector 的文件同步就足够了。但系统总装需要在本地把若干楼层、设备和管道 DWG 作为 Xref 汇总，再分别导出 NWC；非本地的 Total 总装依赖 **9421–9431 范围内各系统上传后的 NWC**，不是本地系统 DWG。文件同步并不会自动完成这些总装、导出和交付步骤。
+如果只有分楼层文件，ACC / Autodesk Forma 与 Desktop Connector 的文件同步就足够了。但系统总装需要在本地把若干楼层、设备和管道 DWG 作为 Xref 汇总，再分别导出 NWC；最终 Assembly NWC 依赖 **9421–9431 范围内各系统在 ACC 中的 NWC**，不是本地系统 DWG。文件同步并不会自动完成这些总装、导出和交付步骤。
 
 Plant 3D 在这个文件式协作流程中，没有可直接替代 Revit **Synchronize with Central** 的同等工作流。Auto sync 不是模拟 Revit 中央模型，而是把文件依赖链明确化，让重复的检查、Pull、总装更新和 NWC 导出可以自动化。
 
-## 文件流：本地系统 DWG → 各系统 NWC → 非本地 Total
+## 文件流：各系统 ACC NWC → 最终 Assembly NWC
 
-![云端楼层DWG经Pull成为本地Xref，组成各系统总装DWG；每个系统分别导出一个NWC上传云端；上传后的各系统NWC组成非本地的Total总装](docs/assets/file-flow.svg)
+![云端楼层DWG经Pull成为本地Xref，组成各系统总装DWG；每个系统分别导出一个NWC上传ACC；各系统ACC中的NWC分别以箭头指向最终Assembly NWC，而非Assembly DWG](docs/assets/file-flow-assembly-nwc.svg)
 
 **关键关系：云端 DWG 下载到本地后，是本地总装的 Xref，不是直接拿云端总装替换本地总装。**
 
@@ -22,7 +22,7 @@ Plant 3D 在这个文件式协作流程中，没有可直接替代 Revit **Synch
 2. **Pull 到本地**：下载需要更新或缺失的源 DWG，保留与系统对应的本地工作目录。
 3. **更新系统总装**：各系统的总装 DWG 引用这些本地源文件，加载当前本地版本。
 4. **导出与交付**：每个系统总装分别导出一个对应的 NWC，再上传到指定云端 NWC 文件夹。例如，9424 总装对应 9424 的 NWC，而不是把多个系统合成一份 NWC。
-5. **非本地端组装 Total**：使用上传后的各系统 NWC 组成整体模型。Total 不属于本地 Plant DWG 总装目录，也不是引用本地系统 DWG 的另一个本地图纸。
+5. **汇入最终 Assembly NWC**：ACC 中每个系统的 NWC 分别指向最终 Assembly NWC（Total，非本地）。最终节点是 NWC，不是 Assembly DWG，不属于本地 Plant DWG 总装目录。
 
 系统编号以项目实际存在的目录为准；本示例使用 9421–9429 和 9431，不预设缺失编号必须有模型。图中箭头表示文件依赖与目标处理顺序，不代表当前版本已实现全部环节的无人值守编排。
 
@@ -46,15 +46,13 @@ Local / NWC TO UPLOAD / YYYY-MM-DD / M-9424_GYPSUM.nwc
                 │ Upload
                 ▼
 ACC / Forma / 9424 的 NWC
-                │ 与其他系统上传后的 NWC 一起组装
-                ▼
-非本地 Total 总装
-  ├─ 9421 的 NWC
-  ├─ 9424 的 NWC
-  └─ 其他系统的 NWC
+                │
+                └──────────────────┐
+ACC / Forma / 9421 的 NWC ──────────┼──→ 最终 Assembly NWC（非本地）
+ACC / Forma / 其他系统的 NWC ───────┘
 ```
 
-以上是便于阅读的示意名称，实际使用完整的项目文件名与人工确认的路径。**本地总装使用 DWG Xref；非本地 Total 使用各系统 NWC。** 此处不把 Total 标为 DWG，也不假定其具体文件格式、协同平台或自动组装机制；它是上传之后的项目协同环节。
+以上是便于阅读的示意名称，实际使用完整的项目文件名与人工确认的路径。**本地系统总装是 DWG；各系统在 ACC 中的 NWC 指向最终 Assembly NWC。** 图中三个独立箭头的终点均为 Assembly NWC，不是 Assembly DWG。最终组装是上传之后的协同环节，不表示当前插件已实现该环节的自动化。
 
 ## 当前功能与边界
 
@@ -68,7 +66,7 @@ ACC / Forma / 9424 的 NWC
 | 当前本地模型原生 NWC 导出、按日期归档 | 已实现 |
 | 更新日志、问题表格、本地 / 云端 NWC 日期比较 | 已实现 |
 | 独立 Plant 进程的批处理入口 | 已实现；定时触发需另行配置 |
-| 使用上传后的各系统 NWC 组装非本地 Total | 外部协同环节，非当前插件功能 |
+| 各系统 ACC NWC 汇入最终 Assembly NWC（Total，非本地） | 外部协同环节，非当前插件功能 |
 | NWC 导出后自动 Push 云端 | 尚未实现；当前手动上传 |
 
 右侧 Xref 清单以云端文件为重点：
@@ -115,7 +113,7 @@ dotnet build '.\src\Plant Model Sync\PlantModelSync.csproj' -c Release '-p:AutoC
 
 ```text
 README.md                       项目背景、文件流与使用说明
-docs/assets/file-flow.svg       首页流程图，可直接维护
+docs/assets/file-flow-assembly-nwc.svg  首页流程图，可直接维护
 docs/file-flow.mmd              Mermaid 版依赖图
 docs/automation.md              批处理配置与自动化边界
 build.ps1 / test.ps1            仓库入口
