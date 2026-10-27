@@ -22,9 +22,9 @@ flowchart TB
     A21 -->|Xref| TOTAL
     A24 -->|Xref| TOTAL
     AX -->|Xref| TOTAL
-    A21 -->|Native export| SYSTEMNWC[System NWC deliverables]
-    A24 -->|Native export| SYSTEMNWC
-    AX -->|Native export| SYSTEMNWC
-    TOTAL -->|Native export| TOTALNWC[Total.nwc]
-    SYSTEMNWC -->|Upload · currently manual| DELIVERY[ACC / Forma · NWC delivery folder]
-    TOTALNWC -->|Upload · currently manual| DELIVERY
+    A21 -->|Native export| N21[9421.nwc · one NWC for system 9421]
+    A24 -->|Native export| N24[9424.nwc · one NWC for system 9424]
+    AX -->|Native export per system| NX[One separate NWC for each other system]
+    N21 -->|Upload · currently manual| DELIVERY[ACC / Forma · separate NWC files per system]
+    N24 -->|Upload · currently manual| DELIVERY
+    NX -->|Upload · currently manual| DELIVERY

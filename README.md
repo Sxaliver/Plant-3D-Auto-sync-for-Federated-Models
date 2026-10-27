@@ -1,6 +1,6 @@
 # Plant 3D Auto sync for Federated Models
 
-**把云端分楼层 DWG，串成可更新的本地系统总装与 Total 总装，再输出 NWC 交付。**
+**云端分楼层 DWG → 本地系统总装 → 每个系统各自导出 NWC；Total DWG 放置各系统的总装 DWG。**
 
 Auto sync 是用于 **AutoCAD Plant 3D 2024 / Windows x64** 的本地插件。当前源码版本 **0.4.15**，交互命令 `SYNC`，通过 Desktop Connector 获取云端发布文件，不需要 APS Client ID。
 
@@ -12,17 +12,17 @@ Auto sync 是用于 **AutoCAD Plant 3D 2024 / Windows x64** 的本地插件。�
 
 Plant 3D 在这个文件式协作流程中，没有可直接替代 Revit **Synchronize with Central** 的同等工作流。Auto sync 不是模拟 Revit 中央模型，而是把文件依赖链明确化，让重复的检查、Pull、总装更新和 NWC 导出可以自动化。
 
-## 文件流：先系统，后 Total
+## 文件流：各系统独立输出 NWC，Total 放置系统总装 DWG
 
-![云端楼层DWG经Pull成为本地Xref，组成各系统总装；各系统导出NWC并汇总为Total总装，Total再导出NWC，最终上传云端](docs/assets/file-flow.svg)
+![云端楼层DWG经Pull成为本地Xref，组成各系统总装DWG；每个系统分别导出一个NWC上传云端；Total DWG放置各系统总装DWG，不放置NWC，也不在此流程导出Total NWC](docs/assets/file-flow.svg)
 
 **关键关系：云端 DWG 下载到本地后，是本地总装的 Xref，不是直接拿云端总装替换本地总装。**
 
 1. **获取源文件**：读取 Connector 中各系统文件夹的发布 DWG，与对应本地 Xref 比较。
 2. **Pull 到本地**：下载需要更新或缺失的源 DWG，保留与系统对应的本地工作目录。
 3. **更新系统总装**：各系统的总装 DWG 引用这些本地源文件，加载当前本地版本。
-4. **处理 Total**：先处理好下级系统总装，再让 Total DWG 加载这些系统总装，避免导出旧的嵌套内容。
-5. **导出与交付**：按交付需要导出系统 NWC、Total NWC，并上传到指定云端 NWC 文件夹。
+4. **导出与交付**：每个系统总装分别导出一个对应的 NWC，再上传到指定云端 NWC 文件夹。例如，9424 总装对应 9424 的 NWC，而不是把多个系统合成一份 NWC。
+5. **放置到 Total**：Total DWG 通过 Xref 放置各系统的总装 DWG，形成整体模型。这与各系统分别导出 NWC 是两个分支；本流程没有 Total NWC 导出步骤。
 
 系统编号以项目实际存在的目录为准；本示例使用 9421–9429 和 9431，不预设缺失编号必须有模型。图中箭头表示文件依赖与目标处理顺序，不代表当前版本已实现全部环节的无人值守编排。
 
@@ -40,15 +40,16 @@ Local / Models / local_9424_GYPSUM DEWATERING SYSTEM
                 │ Xref：本地组合，不 Bind 源图
                 ▼
 Local / Models / 单系统总装文件 / M-9424_GYPSUM.dwg
-                ├─ Native NWC export → NWC TO UPLOAD / YYYY-MM-DD / M-9424_GYPSUM.nwc
-                └─ Xref → Local / Total.dwg ← 其他系统总装
-                                      └─ Native NWC export → Total.nwc
-                                                               │ Upload
-                                                               ▼
-                                               ACC / Forma / NWC deliverables
+                ├─ Native NWC export
+                │      └─ NWC TO UPLOAD / YYYY-MM-DD / M-9424_GYPSUM.nwc
+                │             └─ Upload → ACC / Forma / 9424 的 NWC
+                └─ Xref → Local / Total.dwg
+                               ├─ 放置 M-9421 总装 DWG
+                               ├─ 放置 M-9424 总装 DWG
+                               └─ 放置其他系统总装 DWG
 ```
 
-以上是便于阅读的示意名称，实际使用完整的项目文件名与人工确认的路径。**Total DWG 引用的是系统 DWG；NWC 是导出结果，二者不混用。**
+以上是便于阅读的示意名称，实际使用完整的项目文件名与人工确认的路径。**每个系统各有一份 NWC；Total DWG 引用各系统的总装 DWG，不引用这些 NWC，也不在此流程另导出 Total NWC。**
 
 ## 当前功能与边界
 

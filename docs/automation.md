@@ -4,6 +4,8 @@
 
 Total 是上级总装，不替代下级系统总装。完整流程应先处理每个系统的源 Xref 与系统总装，再处理 Total；需要验证实际图纸中的 Attachment / Overlay、卸载状态和跨系统引用，不能只按文件名假定依赖完整。
 
+交付文件是每个系统分别导出的一份 NWC。Total DWG 放置各系统的总装 DWG，不放置 NWC；各系统导出 NWC 与放置到 Total 是两个分支，本项目文件流不包含 Total NWC 导出。
+
 目前提供 `SYNC` 交互流程与 `PMSWEEKLYRUN` 批处理入口。`Run-Weekly.ps1` 不会自行注册 Windows 计划任务，也不会自动上传 NWC；固定依赖顺序的 Total 全流程编排需要结合实际图纸另行集成和验证。
 
 ## 批处理
