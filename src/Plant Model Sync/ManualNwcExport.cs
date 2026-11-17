@@ -16,6 +16,15 @@ namespace IWMF.PlantModelSync
             // 已选择当天日期目录时复用，避免重复生成日期层级；配置仍保存用户选择的根目录。
             return string.Equals(new DirectoryInfo(root).Name, date, StringComparison.Ordinal) ? root : Path.Combine(root, date);
         }
+        internal static string ExistingOutputFolder(string output)
+        {
+            if (string.IsNullOrWhiteSpace(output) || !Path.IsPathRooted(output)) throw new IOException("请先在“目录”中设置有效的 NWC 输出目录。");
+            var root = Path.GetFullPath(output); var dated = DateFolder(root);
+            // 只打开已有目录，不因浏览操作创建日期文件夹或触发导出。
+            if (Directory.Exists(dated)) return dated;
+            if (Directory.Exists(root)) return root;
+            throw new IOException("NWC 输出目录不存在，请在“目录”中重新选择：" + root);
+        }
         public static List<BatchExportJob> Plan(IEnumerable<string> files, string output, IReferenceReader reader, WorkflowSession known = null, CancellationToken ct = default, Action<string> progress = null)
         {
             if (string.IsNullOrWhiteSpace(output) || !Path.IsPathRooted(output)) throw new IOException("请选择本地 NWC 输出目录。");

@@ -62,6 +62,7 @@ namespace IWMF.PlantModelSync
     internal sealed class WeeklyUpdate
     {
         internal readonly WeeklyRequest Request;
+        internal Func<IReadOnlyList<string>, IReadOnlyList<string>, IDisposable> BeginReportUpdate { get; set; }
         internal readonly Settings Config;
         internal readonly IWeeklyDwg Reader;
         internal readonly WeeklyLedger Ledger;
@@ -235,6 +236,8 @@ namespace IWMF.PlantModelSync
             // 提交前对全部原文件做预检；遇到并行修改，不以新哈希悄悄接受。
             foreach (var n in Nodes.Values)
                 if (Files.Hash(n.Local) != n.BeforeHash) throw new IOException("扫描期间本地文件发生变化：" + n.Local);
+            var reportChanges = Nodes.Values.Where(n => n.Rewrites.Count > 0 || n.Cloud != null && n.LocalDate != n.CloudDate).Select(n => n.Local).Concat(additions.Keys).Concat(additions.Values.SelectMany(p => p)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            using var modelEvidence = Request.DryRun || reportChanges.Count == 0 ? null : BeginReportUpdate?.Invoke(assemblies, reportChanges);
             foreach (var n in Nodes.Values.OrderBy(n => initialAssemblies.ContainsKey(n.Local)))
             {
                 if (n.Error != null || n.Cloud == null && !initialAssemblies.ContainsKey(n.Local)) continue;
@@ -312,7 +315,7 @@ namespace IWMF.PlantModelSync
                     a.UpdatedPaths = changed.Where(p=>dependencies.Contains(p)&&!string.Equals(p,file,StringComparison.OrdinalIgnoreCase)).ToList(); a.Selected = true;
                     var name = Path.GetFileNameWithoutExtension(file);
                     if (duplicateNames.Contains(name)) name += "__" + Signature(new Dictionary<string,string> { [file] = "" }).Substring(0, 8);
-                    Jobs.Add(new BatchExportJob { Assembly = a, Target = Path.Combine(DateFolder, name + ".nwc") });
+                    Jobs.Add(new BatchExportJob { Assembly = a, Target = Path.Combine(DateFolder, name + ".nwc"), ReportStorage = Request.Storage });
                 }
                 catch (Exception ex) { Log("周更 NWC", file, "跳过，待处理", ex.Message, assembly: file); }
             }
@@ -330,6 +333,8 @@ namespace IWMF.PlantModelSync
                 if (job.Assembly.ExportState == "已导出" && Files.Hash(job.Target) == job.Assembly.ExportHash && !string.IsNullOrEmpty(job.Assembly.ExportHash))
                     Ledger.Exports[job.Assembly.Path] = new WeeklyExportReceipt { Signature = Signatures[job.Assembly.Path], Output = job.Target, OutputHash = job.Assembly.ExportHash };
                 Log("周更 NWC", job.Assembly.Path, job.Assembly.ExportState, "输出=" + job.Target, after: job.Assembly.ExportHash, assembly: job.Assembly.Path);
+                if (job.ReportError != null) Log("周更 PDF 报告", job.Assembly.Path, "失败，待处理", job.ReportError, assembly: job.Assembly.Path);
+                else if (job.ReportPdf != null) Log("周更 PDF 报告", job.Assembly.Path, "已生成", job.ReportPdf, assembly: job.Assembly.Path);
             }
             AtomicJson(LedgerPath, Ledger);
             Completed = true; State = "周更结束，详见逐项日志"; Save();

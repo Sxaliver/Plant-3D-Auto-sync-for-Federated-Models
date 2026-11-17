@@ -5,7 +5,7 @@ $OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($f
 $moduleRoot = Join-Path $PSScriptRoot 'Plant Model Sync'
 & dotnet build (Join-Path $moduleRoot 'PlantModelSync.csproj') -c Release --nologo
 if ($LASTEXITCODE -ne 0) { throw 'Plant Model Sync 编译失败' }
-$bundle = Join-Path $moduleRoot 'artifacts\Release-0.4.15\IWMF.PlantModelSync.bundle'
+$bundle = Join-Path $moduleRoot 'artifacts\Release-0.4.21\IWMF.PlantModelSync.bundle'
 $buildId = (Get-FileHash -LiteralPath (Join-Path $moduleRoot 'bin\Release\net48\IWMF.PlantModelSync.dll')).Hash.Substring(0, 12)
 $contents = Join-Path $bundle "Contents\$buildId"
 New-Item -ItemType Directory -Path $contents -Force | Out-Null
@@ -21,7 +21,7 @@ foreach ($name in @('IWMF.PlantModelSync.dll', 'Newtonsoft.Json.dll')) {
     Copy-Item -LiteralPath (Join-Path $moduleRoot "bin\Release\net48\$name") -Destination $contents -Force
 }
 Copy-Item -LiteralPath (Join-Path $moduleRoot 'README.md') -Destination $bundle -Force
-$archive = Join-Path $moduleRoot 'artifacts\IWMF.PlantModelSync-0.4.15.zip'
+$archive = Join-Path $moduleRoot 'artifacts\IWMF.PlantModelSync-0.4.21.zip'
 Compress-Archive -Path $bundle -DestinationPath $archive -Force
 if ($Install) {
     $target = Join-Path $env:APPDATA 'Autodesk\ApplicationPlugins\IWMF.PlantModelSync.bundle'

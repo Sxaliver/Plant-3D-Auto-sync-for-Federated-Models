@@ -13,6 +13,13 @@ namespace IWMF.PlantModelSync
         private Control pathFields, modelDetailsPanel;
         private readonly Label pathSummary = new Label { Dock = DockStyle.Top, Height = 30, Padding = new Padding(16, 5, 16, 0), AutoEllipsis = true, AccessibleName = "当前目录摘要，点击展开配置" };
         private readonly ToolTip uiTips = new ToolTip();
+        internal Action<System.Diagnostics.ProcessStartInfo> StartNwcFolder = info => System.Diagnostics.Process.Start(info);
+        private void OpenNwcFolder()
+        {
+            var folder = ManualNwcExport.ExistingOutputFolder(output.Text);
+            StartNwcFolder(new System.Diagnostics.ProcessStartInfo("explorer.exe", "\"" + folder + "\"") { UseShellExecute = true });
+            status.Text = "NWC 文件夹：" + folder; uiTips.SetToolTip(status, folder);
+        }
         private void TogglePaths() { pathFields.Visible = !pathFields.Visible; UpdatePathSummary(); }
         private void UpdatePathSummary()
         {

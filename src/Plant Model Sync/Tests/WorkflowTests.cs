@@ -15,6 +15,7 @@ namespace IWMF.PlantModelSync
     // 本程序集只使用假 DWG 读取器，文件复制、哈希及备份采用生产实现。
     internal static class Host
     {
+        internal static IDisposable BeginModelReportUpdate(WorkflowSession session, IEnumerable<string> files, string storage) => null;
         internal static List<ProjectDrawing> Drawings = new List<ProjectDrawing>();
         public static List<ProjectDrawing> CurrentProjectDrawings() => Drawings;
         public static void CheckSourcesClosed(IEnumerable<XrefRow> rows) { }
@@ -216,11 +217,13 @@ namespace IWMF.PlantModelSync
             await VerifyReferenceIdentity(evidence);
             await VerifyReferenceCandidates(evidence);
             await VerifyReferencePriorityAndRefresh(evidence);
+            await VerifyAssemblySummaryColors(evidence);
+            VerifyModelReports(evidence);
             await VerifyReferenceNames(evidence);
             await VerifyPullDates(evidence);
             await VerifyScanProgress(evidence);
             Check(Files.Hash(liveConfig) == liveBefore, "隔离验证未改写用户插件配置");
-            File.WriteAllText(Path.Combine(evidence, "verification.json"), JsonConvert.SerializeObject(new { version = "0.4.15", checks = Count, passedChecks = Passed, fakeDwgReader = true, nativePlantHostTested = false, nativeNwcExporterTested = false, sources = session.Sources.Select(s => new { s.Name, s.State, s.LocalSummary }), assemblies = session.Assemblies.Select(m => new { m.Path, m.UpdatedXrefs, m.RefreshState }), jobs = jobs.Select(j => new { j.Target, j.CurrentLocal }) }, Formatting.Indented), new UTF8Encoding(false));
+            File.WriteAllText(Path.Combine(evidence, "verification.json"), JsonConvert.SerializeObject(new { version = "0.4.21", checks = Count, passedChecks = Passed, fakeDwgReader = true, nativePlantHostTested = false, nativeNwcExporterTested = false, sources = session.Sources.Select(s => new { s.Name, s.State, s.LocalSummary }), assemblies = session.Assemblies.Select(m => new { m.Path, m.UpdatedXrefs, m.RefreshState }), jobs = jobs.Select(j => new { j.Target, j.CurrentLocal }) }, Formatting.Indented), new UTF8Encoding(false));
         }
     }
 }

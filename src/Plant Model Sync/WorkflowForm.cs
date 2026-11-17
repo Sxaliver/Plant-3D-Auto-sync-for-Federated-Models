@@ -81,12 +81,13 @@ namespace IWMF.PlantModelSync
             Button(tools, "目录", TogglePaths);
             MenuButton(tools, "更多", menu =>
             {
+                MenuAction(menu, "打开 NWC 文件夹", OpenNwcFolder);
                 MenuAsync(menu, "从文件夹导出 NWC…", BrowseNwcExport);
                 MenuAsync(menu, "强制刷新", async () => { Session?.InvalidateAutomaticMappings(); await Check(); });
                 MenuAction(menu, "查看问题", () => { using (var form = new ScanIssuesForm(Session)) form.ShowDialog(this); });
                 var detailed = new ToolStripMenuItem("详细信息") { CheckOnClick = true };
                 detailed.CheckedChanged += (s, e) => SetDetailedView(detailed.Checked); menu.Items.Add(detailed);
-                menu.Items.Add(new ToolStripSeparator()); MenuAction(menu, "恢复已保存目录", UseSavedPaths);
+                menu.Items.Add(new ToolStripSeparator()); MenuAction(menu, "恢复 IWMF 目录", UseIwmfPaths);
             });
             cancel.Click += (s, e) => work?.Cancel(); tools.Controls.Add(cancel);
             AddColumn(sourcesGrid, "Selected", "更新", 48, true);
@@ -223,13 +224,12 @@ namespace IWMF.PlantModelSync
             foreach (var tools in table.Controls.OfType<FlowLayoutPanel>()) tools.Height = 51;
         }
         private void Browse(TextBox box) { using (var dialog = new FolderBrowserDialog { SelectedPath = Directory.Exists(box.Text) ? box.Text : "" }) if (dialog.ShowDialog(this) == DialogResult.OK) box.Text = dialog.SelectedPath; }
-        private void UseSavedPaths()
+        private void UseIwmfPaths()
         {
-            // 公开源码不包含机器专用预设，只恢复用户已保存的路径。
-            connector.Text = settings.ConnectorRoot ?? "";
-            localRoot.Text = settings.LocalModelsRoot ?? "";
-            scopeFolder = settings.ProjectScanFolder ?? ""; scope.Text = scopeFolder;
-            status.Text = "已恢复已保存目录";
+            connector.Text = "";
+            localRoot.Text = "";
+            scopeFolder = Path.Combine(localRoot.Text, "单系统总装文件"); scope.Text = scopeFolder;
+            status.Text = "请使用浏览按钮设置本机目录";
         }
         private void OpenLog()
         {
@@ -420,6 +420,7 @@ namespace IWMF.PlantModelSync
                 using (var dialog = new NewCloudFilesForm(Session, batch))
                     if (dialog.ShowDialog(this) != DialogResult.OK) return;
                 var selected = NewCloudFiles.ValidateSelection(Session, batch);
+                using var modelEvidence = Host.BeginModelReportUpdate(Session, selected.SelectMany(f => f.Targets.Append(f.Local)), reportStorage);
                 try { await NewCloudFiles.Run(Session, batch, service, ct, Host.CheckAssemblyClosedForAttach, Host.StageNewReferences, reportStorage); }
                 finally
                 {
@@ -490,6 +491,7 @@ namespace IWMF.PlantModelSync
                 Session.LastLog = journal.Path;
                 Session.LastUpdateLog = journal.Path;
                 IDisposable references = null;
+                using var modelEvidence = Host.BeginModelReportUpdate(Session, approved.Where(p => !p.IsUnchanged).Select(p => p.Local), reportStorage);
                 string failure = null;
                 try
                 {

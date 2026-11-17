@@ -5,11 +5,12 @@
     <LangVersion>10.0</LangVersion>
     <PlatformTarget>x64</PlatformTarget>
     <AssemblyName>IWMF.PlantModelSync</AssemblyName>
-    <Version>0.4.15</Version>
+    <Version>0.4.21</Version>
     <AutoCADDir Condition="'$(AutoCADDir)' == ''">C:\Program Files\Autodesk\AutoCAD 2024</AutoCADDir>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Tests\**;artifacts\**;ApsClient.cs;Authentication.cs" />
+    <Compile Remove="ModelReportSmoke.cs" Condition="'$(IncludeReportTests)' != 'true'" />
     <Compile Remove="HostSmoke.cs" Condition="'$(IncludeHostTests)' != 'true'" />
     <Compile Remove="NewCloudFilesSmoke.cs" Condition="'$(IncludeHostTests)' != 'true'" />
     <Compile Remove="ReferenceScopeSmoke.cs" Condition="'$(IncludeHostTests)' != 'true'" />

@@ -21,6 +21,7 @@ namespace IWMF.PlantModelSync
             WorkflowTestProgram.Check(Session == null, "无勾选的强制刷新同样不扩大检查范围");
             WorkflowTestProgram.Check(!pathFields.Visible && !sourceDetail.Visible && !modelDetailsPanel.Visible && Controls.OfType<FlowLayoutPanel>().Single().Controls.OfType<Button>().Count(b => b.Visible) == 5, "总装界面只有五个主要入口且不显示目录行及旧详情区");
             WorkflowTestProgram.Check(Controls.OfType<FlowLayoutPanel>().Single().Controls.OfType<Button>().Any(b => b.Text == "检查所选"), "批量检查按钮准确命名为检查所选");
+            VerifyOpenNwcFolderMenu(Controls.OfType<FlowLayoutPanel>().Single().Controls.OfType<Button>().Single(b => b.Text == "更多").ContextMenuStrip, evidence);
             var aboutOpened = false;
             using (var timer = new Timer { Interval = 50 })
             {

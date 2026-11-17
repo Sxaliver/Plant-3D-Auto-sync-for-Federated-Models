@@ -15,6 +15,14 @@ namespace IWMF.PlantModelSync
         public string Path { get; set; }
         public string Name => System.IO.Path.GetFileName(Path);
         public string State { get; set; } = "未检查";
+        public int ReferencePriority { get; set; } = 2;
+        public void UpdateReferenceSummary(IEnumerable<ReferenceComparisonRow> references, bool complete)
+        {
+            // 汇总完整清单而非右侧当前筛选；空清单、扫描异常和待确认项不能冒充全绿。
+            var rows = references.ToList();
+            ReferencePriority = rows.Any(r => r.DisplayPriority == 1) ? 1
+                : complete && rows.Count > 0 && rows.All(r => r.DisplayPriority == 0) ? 0 : 2;
+        }
     }
     internal sealed class ReferenceComparisonRow
     {
@@ -88,6 +96,11 @@ namespace IWMF.PlantModelSync
             foreach (var spec in new[] { new[] { "Name", "Xref DWG" }, new[] { "LocalState", "本地状态" }, new[] { "CloudState", "云端状态" }, new[] { "State", "对比结果" }, new[] { "Local", "本地路径" }, new[] { "Cloud", "Connector 路径" }, new[] { "LocalDate", "本地修改时间" }, new[] { "CloudDate", "云端修改时间" } })
                 AddColumn(refs, spec[0], spec[1], spec[0] == "Name" ? 220 : spec[0] == "Local" || spec[0] == "Cloud" ? 300 : 135);
             assemblyBrowser = new ReviewTable<AssemblyBrowserRow>(grid, r => r.Name + " " + r.Path + " " + r.State, r => r.State);
+            grid.CellFormatting += (s, e) =>
+            {
+                if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && grid.Rows[e.RowIndex].DataBoundItem is AssemblyBrowserRow row)
+                    ApplyReferenceGroupColor(e.CellStyle, row.ReferencePriority);
+            };
             referenceBrowser = new ReviewTable<ReferenceComparisonRow>(refs, r => r.Name + " " + r.ReferenceName + " " + r.Local + " " + r.Cloud + " " + r.Comparison, r => r.State);
             referenceBrowser.SortGroup = r => r.DisplayPriority;
             Compact(assemblyBrowser); Compact(referenceBrowser);
@@ -151,6 +164,7 @@ namespace IWMF.PlantModelSync
             AsyncButton(toolbar, "导出 NWC", ExportBrowserSelection);
             MenuButton(toolbar, "更多", menu =>
             {
+                MenuAction(menu, "打开 NWC 文件夹", OpenNwcFolder);
                 MenuAsync(menu, "强制刷新", () => InspectCheckedAssemblies(true));
                 MenuAction(menu, "查看问题", () => { using (var dialog = new ScanIssuesForm(Session)) dialog.ShowDialog(this); });
                 MenuAction(menu, "更新日志", OpenLog); MenuAction(menu, "NWC 日期", CheckNwcDates);
@@ -224,18 +238,22 @@ namespace IWMF.PlantModelSync
         {
             // 仅丢弃可再生成的检测结果；人工文件/文件夹规则、同步记录和导出历史不是缓存。
             Session?.InvalidateAutomaticMappings(); linkedCloudPaths.Clear(); displayedAssemblyPath = null;
-            foreach (var row in browserRows) row.State = "未检查";
+            foreach (var row in browserRows) { row.State = "未检查"; row.ReferencePriority = 2; }
             referenceBrowser.SetRows(new ReferenceComparisonRow[0]); referenceTitle.Text = "Xref";
             assemblyBrowser.Grid.Refresh();
         }
         internal static void ApplyReferenceColor(DataGridViewCellStyle style, ReferenceComparisonRow row)
         {
-            if (row.DisplayPriority == 0)
+            ApplyReferenceGroupColor(style, row.MissingLocalAvailableCloud ? 1 : row.DisplayPriority);
+        }
+        private static void ApplyReferenceGroupColor(DataGridViewCellStyle style, int priority)
+        {
+            if (priority == 0)
             {
                 style.BackColor = Color.FromArgb(220, 244, 228); style.SelectionBackColor = Color.FromArgb(190, 230, 206);
                 style.ForeColor = style.SelectionForeColor = Color.FromArgb(26, 98, 54);
             }
-            else if (row.DisplayPriority == 1 || row.MissingLocalAvailableCloud)
+            else if (priority == 1)
             {
                 style.BackColor = style.SelectionBackColor = Color.FromArgb(255, 237, 170);
                 style.ForeColor = style.SelectionForeColor = Color.FromArgb(120, 78, 0);
@@ -266,6 +284,8 @@ namespace IWMF.PlantModelSync
             var run = BeginScanProgress("准备检查");
             try
             {
+                foreach (var row in browserRows.Where(r => paths.Contains(r.Path, StringComparer.OrdinalIgnoreCase))) row.ReferencePriority = 2;
+                assemblyBrowser.Grid.Refresh();
                 inspectionPaths = paths; if (Session != null) Session.Checked = false;
                 await Check();
                 ReportScanProgress(run, "整理总装 / Xref 列表");
@@ -273,6 +293,7 @@ namespace IWMF.PlantModelSync
                 {
                     var a = Session?.Assemblies.FirstOrDefault(x => x.Path == row.Path);
                     var comparisons = Session?.Checked != true || a == null ? new List<ReferenceComparisonRow>() : BuildReferenceComparison(a);
+                    row.UpdateReferenceSummary(comparisons, Session?.Checked == true && a != null && a.Scan.Warnings.Count == 0);
                     row.State = Session?.Checked != true ? "检查未完成" : a == null || a.Scan.Warnings.Count > 0 ? "需处理" : comparisons.Any(r => r.State != "日期相同" && r.State != "已 Pull") ? "有差异" : "已检查";
                 }
                 assemblyBrowser.Grid.Refresh();
@@ -325,6 +346,7 @@ namespace IWMF.PlantModelSync
                 }
                 var rows = new List<UpdateReportRow>(); var log = Path.Combine(reportStorage, "Logs", "PathRepairs", "assembly-paths-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N") + ".json");
                 Session.LastLog = Session.LastUpdateLog = log;
+                using var modelEvidence = Host.BeginModelReportUpdate(Session, plans.Select(p => p.Assembly), reportStorage);
                 try
                 {
                     // 批次开始前统一检查，避免只修复前一份后才发现后一份仍在打开。
@@ -355,7 +377,11 @@ namespace IWMF.PlantModelSync
             displayedAssemblyPath = path;
             var assembly = Session?.Assemblies.FirstOrDefault(a => a.Path == path);
             referenceTitle.Text = Path.GetFileName(path) + " · Xref";
-            referenceBrowser.SetRows(assembly == null ? new List<ReferenceComparisonRow>() : BuildReferenceComparison(assembly));
+            var comparisons = assembly == null ? new List<ReferenceComparisonRow>() : BuildReferenceComparison(assembly);
+            referenceBrowser.SetRows(comparisons);
+            var summary = browserRows.FirstOrDefault(r => string.Equals(r.Path, path, StringComparison.OrdinalIgnoreCase));
+            summary?.UpdateReferenceSummary(comparisons, Session?.Checked == true && assembly != null && assembly.Scan.Warnings.Count == 0);
+            assemblyBrowser.Grid.Refresh();
             foreach (var label in referenceBrowser.Grid.Controls.OfType<Label>()) label.Text = assembly == null ? "尚未检查" : assembly.Scan.Warnings.Count > 0 ? "引用读取异常，请查看问题" : "此总装没有 Xref";
         }
         private void EditBrowserDirectories()

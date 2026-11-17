@@ -86,6 +86,7 @@ namespace IWMF.PlantModelSync
                     Session.LastLog = Session.LastUpdateLog = journal.Path;
                     journal.Write("执行中", null);
                     var affected = Session.Assemblies.Where(a => plans.Any(p => p.AffectedAssemblies.Contains(a.Path))).ToList();
+                    using var modelEvidence = Host.BeginModelReportUpdate(Session, plans.Where(p => !p.IsUnchanged).Select(p => p.Local), reportStorage);
                     IDisposable released = null;
                     try
                     {

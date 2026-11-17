@@ -2,7 +2,15 @@
 
 **云端分楼层 DWG → 本地系统总装 → 每个系统各自导出 NWC → 上传 ACC → 各系统 ACC NWC 分别指向最终 Assembly NWC（非本地）。**
 
-Auto sync 是用于 **AutoCAD Plant 3D 2024 / Windows x64** 的本地插件。当前源码版本 **0.4.15**，交互命令 `SYNC`，通过 Desktop Connector 获取云端发布文件，不需要 APS Client ID。
+Auto sync 是用于 **AutoCAD Plant 3D 2024 / Windows x64** 的本地插件。当前源码版本 **0.4.21**，交互命令 `SYNC`，通过 Desktop Connector 获取云端发布文件，不需要 APS Client ID。
+
+## Download / 安装（包含自动报告）
+
+从 [GitHub Releases](https://github.com/Sxaliver/Plant-3D-Auto-sync-for-Federated-Models/releases) 下载完整 ZIP，解压后在 PowerShell 执行 Install.ps1，保存并重启 Plant，运行 SYNC。安装包包含插件、便携 Tectonic 与无公司标识的通用 TeX 模板。首次生成 PDF 需要联网下载 TeX 资源；不是完全离线安装包。
+
+每次导出自动生成英文 PDF，附模型文件级变更和 before / after 截图，保存在 NWC 的日期目录。前图必须在插件更新前捕获；单纯导出不能补造历史前图。图片包含总装模型名与唯一标识。报告失败保留成功 NWC 并明确提示。详见 [安装与报告说明](release/README.md)。
+
+接收者须另行安装 Plant 3D 2024、Desktop Connector 和匹配的原生 Navisworks NWC Exporter。本包不含 Autodesk 产品或许可。目录、系统匹配与定位参数必须按自己的项目复核；原 IWMF 的默认坐标和 -4.42° 不适用于所有项目。未包含个人配置、模型、运行日志或原项目品牌模板。安装不自动注册周更任务，也不自动上传 NWC。
 
 ## 为什么需要 Auto sync
 

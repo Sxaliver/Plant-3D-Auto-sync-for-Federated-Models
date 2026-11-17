@@ -1,4 +1,4 @@
-# Auto sync · 0.4.15
+# Auto sync · 0.4.21
 
 AutoCAD Plant 3D 2024 / Windows x64；交互命令 `SYNC`，批处理入口 `PMSWEEKLYRUN`。
 

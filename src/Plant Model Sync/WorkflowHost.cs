@@ -166,12 +166,24 @@ namespace IWMF.PlantModelSync
                 }
             }
             var session = BatchSession;
+            try
+            {
+                AcApp.DocumentManager.MdiActiveDocument?.Editor.WriteMessage("\n正在为本次 NWC 生成模型更新 PDF 与截图...\n");
+                var reports = Host.FinishModelReports(BatchFinished);
+                var errors = reports.Where(r => r.Error != null).Select(r => r.Error).Concat(BatchFinished.Where(j => j.ReportError != null).Select(j => j.ReportError)).Distinct().ToList();
+                if (errors.Count > 0)
+                {
+                    if (BatchCompletion == null) AcApp.ShowAlertDialog(string.Join("\n", errors));
+                    else AcApp.DocumentManager.MdiActiveDocument?.Editor.WriteMessage("\n" + string.Join("\n", errors));
+                }
+            }
+            catch (Exception ex) { foreach (var item in BatchFinished) item.ReportError = "PDF 报告失败：" + ex.Message; }
             foreach (var finished in BatchFinished.Where(j => j.ManualSelection)) Workflow.RecordExportResult(session, finished);
             try
             {
-                var dir = Path.Combine(Settings.DataDirectory, "Logs"); Directory.CreateDirectory(dir);
+                var dir = Path.Combine(BatchFinished.FirstOrDefault()?.ReportStorage ?? Settings.DataDirectory, "Logs"); Directory.CreateDirectory(dir);
                 session.LastLog = Path.Combine(dir, "batch-nwc-" + DateTime.UtcNow.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N").Substring(0, 8) + ".json");
-                File.WriteAllText(session.LastLog, JsonConvert.SerializeObject(BatchFinished.Select(j => new { assembly = j.Assembly.Path, manualSelection = j.ManualSelection, currentLocal = j.CurrentLocal, mode = j.CurrentLocal ? "当前本地模型；不检查同步，不承诺引用完整性" : "已校验更新快照", updatedXrefs = j.Assembly.UpdatedPaths, expectedHashes = j.Assembly.ExpectedHashes, target = j.Target, result = j.Assembly.ExportState, outputHash = j.Assembly.ExportHash }), Formatting.Indented), new UTF8Encoding(false));
+                File.WriteAllText(session.LastLog, JsonConvert.SerializeObject(BatchFinished.Select(j => new { assembly = j.Assembly.Path, manualSelection = j.ManualSelection, currentLocal = j.CurrentLocal, mode = j.CurrentLocal ? "当前本地模型；不检查同步，不承诺引用完整性" : "已校验更新快照", updatedXrefs = j.Assembly.UpdatedPaths, expectedHashes = j.Assembly.ExpectedHashes, target = j.Target, result = j.Assembly.ExportState, outputHash = j.Assembly.ExportHash, reportPdf = j.ReportPdf, reportError = j.ReportError }), Formatting.Indented), new UTF8Encoding(false));
             }
             catch (Exception ex) { AcApp.ShowAlertDialog("批次已结束，但日志写入失败：" + ex.Message); }
             finally { BatchJobs = null; BatchSession = null; ResumeWorkflow = session; }
@@ -187,7 +199,7 @@ namespace IWMF.PlantModelSync
         public void ExportBatchItem()
         {
             if (BatchCurrent == null) return;
-            try { Host.ExportWorkflowJob(BatchCurrent); }
+            try { Host.ExportWorkflowJob(BatchCurrent); Host.CaptureExportReport(BatchCurrent); }
             catch (Autodesk.AutoCAD.Runtime.Exception ex) when (ex.ErrorStatus == ErrorStatus.UserBreak) { BatchCurrent.Assembly.ExportState = "已取消"; BatchStop = true; }
             catch (Exception ex) { BatchCurrent.Assembly.ExportState = "导出失败：" + ex.Message; }
             finally { AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("PMSBATCHNEXT ", true, false, false); }

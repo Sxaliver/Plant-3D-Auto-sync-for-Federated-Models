@@ -49,6 +49,12 @@
     <Compile Include="ReferenceIdentityTests.cs" />
     <Compile Include="ReferenceCandidateTests.cs" />
     <Compile Include="ReferencePriorityRefreshTests.cs" />
+    <Compile Include="AssemblySummaryColorTests.cs" />
+    <Compile Include="ModelReportTests.cs" />
+    <Compile Include="..\ModelReportEvidence.cs" Link="ModelReportEvidence.cs" />
+    <Compile Include="..\ReportImageQuality.cs" Link="ReportImageQuality.cs" />
+    <Compile Include="..\ModelUpdateReport.cs" Link="ModelUpdateReport.cs" />
+    <Compile Include="..\ModelReportEnglish.cs" Link="ModelReportEnglish.cs" />
     <Compile Include="ReferenceNameTests.cs" />
     <Compile Include="..\ReferenceComparisonBuilder.cs" Link="ReferenceComparisonBuilder.cs" />
     <Compile Include="..\ReferenceNamePolicy.cs" Link="ReferenceNamePolicy.cs" />

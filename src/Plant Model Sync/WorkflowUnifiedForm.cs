@@ -88,6 +88,8 @@ namespace IWMF.PlantModelSync
                 var report = OneClickReport.Create(reportStorage);
                 Session.LastUpdateLog = Session.LastLog = report.Path;
                 report.State = "执行中"; OneClickUpdate.Capture(report, plan, Session);
+                using var modelEvidence = Host.BeginModelReportUpdate(Session,
+                    approved.Where(p => !p.IsUnchanged).Select(p => p.Local).Concat(plan.NewFiles.Files.Where(f => f.Selected).SelectMany(f => f.Targets.Append(f.Local))), reportStorage);
                 try
                 {
                     if (approved.Count > 0)

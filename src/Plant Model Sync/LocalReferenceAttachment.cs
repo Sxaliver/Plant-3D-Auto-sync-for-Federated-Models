@@ -110,6 +110,7 @@ namespace IWMF.PlantModelSync
                     var log = Path.Combine(reportStorage, "Logs", "LocalReferences", "local-xref-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N") + ".json");
                     Session.LastLog = Session.LastUpdateLog = log;
                     AttachmentResult result;
+                    using var modelEvidence = Host.BeginModelReportUpdate(Session, new[] { target, row.Local }.Concat(plan.Repair?.Changes.Keys ?? Enumerable.Empty<string>()), reportStorage);
                     try { result = LocalReferenceAttachment.Run(plan, log, Host.CheckAssemblyClosedForAttach, (path, placements) => Host.StageConfirmedLocalReferences(path, placements, plan.UnloadedWarningsConfirmed), ct); }
                     finally
                     {

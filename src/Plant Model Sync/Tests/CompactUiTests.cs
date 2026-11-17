@@ -24,7 +24,8 @@ namespace IWMF.PlantModelSync
             var visibleButtons = toolbar.Controls.OfType<Button>().Where(b => b.Visible).ToList();
             WorkflowTestProgram.Check(visibleButtons.Count == 8 && new[] { "检查更新", "一键更新", "导出 NWC", "本地 DWG", "NWC 日期", "日志", "目录", "更多" }.All(name => visibleButtons.Any(b => b.Text == name)), "主工具栏仅保留8个短名称常用入口");
             var menu = visibleButtons.Single(b => b.Text == "更多").ContextMenuStrip;
-            WorkflowTestProgram.Check(new[] { "从文件夹导出 NWC…", "强制刷新", "查看问题", "详细信息", "恢复已保存目录" }.All(name => menu.Items.OfType<ToolStripMenuItem>().Any(i => i.Text == name)), "更多菜单保留强制刷新和查看问题的新名称");
+            VerifyOpenNwcFolderMenu(menu, evidence);
+            WorkflowTestProgram.Check(new[] { "从文件夹导出 NWC…", "强制刷新", "查看问题", "详细信息", "恢复 IWMF 目录" }.All(name => menu.Items.OfType<ToolStripMenuItem>().Any(i => i.Text == name)), "更多菜单保留强制刷新和查看问题的新名称");
             var issueDialogOpened = false;
             using (var dismiss = new Timer { Interval = 50 })
             {
@@ -56,6 +57,35 @@ namespace IWMF.PlantModelSync
             TogglePaths(); PerformLayout(); Refresh();
             using (var bitmap = new Bitmap(Width, Height)) { DrawToBitmap(bitmap, new Rectangle(0, 0, Width, Height)); bitmap.Save(Path.Combine(evidence, "compact-sync-paths.png"), ImageFormat.Png); }
             TogglePaths();
+        }
+        internal void VerifyOpenNwcFolderMenu(ContextMenuStrip menu, string evidence)
+        {
+            var item = menu.Items.OfType<ToolStripMenuItem>().Single(i => i.Text == "打开 NWC 文件夹");
+            WorkflowTestProgram.Check(item.Enabled, "更多提供打开NWC文件夹入口");
+            var previous = output.Text; var previousLaunch = StartNwcFolder;
+            var previousConfig = settings.OutputFolder;
+            var checkedModels = Session?.Assemblies.Where(a => a.Selected).Select(a => a.Path).ToArray() ?? new string[0];
+            var launches = new System.Collections.Generic.List<System.Diagnostics.ProcessStartInfo>();
+            var root = Path.Combine(evidence, "打开 NWC 文件夹", Guid.NewGuid().ToString("N").Substring(0, 8)); Directory.CreateDirectory(root);
+            var dated = ManualNwcExport.DateFolder(root);
+            StartNwcFolder = info => launches.Add(info);
+            try
+            {
+                output.Text = root; item.PerformClick();
+                WorkflowTestProgram.Check(launches.Count == 1 && launches[0].FileName == "explorer.exe" && launches[0].UseShellExecute && launches[0].Arguments == "\"" + Path.GetFullPath(root) + "\"" && !Directory.Exists(dated), "当日目录尚无时打开NWC根目录，路径支持中文空格且不自动创建目录");
+                Directory.CreateDirectory(dated); item.PerformClick();
+                WorkflowTestProgram.Check(launches.Count == 2 && launches[1].Arguments == "\"" + dated + "\"", "已存在当日输出目录时菜单直接打开当日文件夹");
+                output.Text = dated; item.PerformClick();
+                WorkflowTestProgram.Check(launches[2].Arguments == "\"" + dated + "\"", "输出已指向当日目录时不重复嵌套日期");
+                foreach (var invalid in new[] { "", "relative-folder", Path.Combine(root, "不存在") })
+                {
+                    output.Text = invalid; bool rejected = false;
+                    try { OpenNwcFolder(); } catch (IOException) { rejected = true; }
+                    WorkflowTestProgram.Check(rejected && launches.Count == 3, "无效NWC输出目录给出明确错误且不启动资源管理器");
+                }
+                WorkflowTestProgram.Check(settings.OutputFolder == previousConfig && checkedModels.SequenceEqual(Session?.Assemblies.Where(a => a.Selected).Select(a => a.Path).ToArray() ?? new string[0]), "打开输出目录不修改配置或总装勾选，不触发扫描同步及导出");
+            }
+            finally { output.Text = previous; StartNwcFolder = previousLaunch; }
         }
     }
 }

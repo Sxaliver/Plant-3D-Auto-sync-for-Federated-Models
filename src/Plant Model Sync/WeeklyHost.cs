@@ -106,7 +106,9 @@ namespace IWMF.PlantModelSync
                 AcApp.SetSystemVariable("LOGFILEMODE",1);
                 if(BatchJobs!=null)throw new IOException("批量导出仍在运行。");
                 var config=JsonConvert.DeserializeObject<Settings>(File.ReadAllText(request.SettingsPath,Encoding.UTF8));
-                run=new WeeklyUpdate(request,config,new WeeklyNativeDwg()); run.Prepare();
+                run=new WeeklyUpdate(request,config,new WeeklyNativeDwg());
+                run.BeginReportUpdate=(models,files)=>Host.BeginModelReportUpdate(new WorkflowSession { OutputFolder=run.DateFolder, Assemblies=models.Select(p=>Workflow.ScanAssembly(p,new DwgReader(),true)).ToList() },files,request.Storage);
+                run.Prepare();
                 if(run.Jobs.Count==0) { run.Save(); QuitWeekly(request); return; }
                 var captured=run;
                 BatchCompletion=jobs=>

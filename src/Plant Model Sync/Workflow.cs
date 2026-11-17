@@ -419,5 +419,9 @@ namespace IWMF.PlantModelSync
         public bool ManualSelection { get; set; }
         // 交互导出按当前宿主状态执行；周更默认 false，继续使用原校验流程。
         public bool CurrentLocal { get; set; }
+        public ModelReportPage ReportPage { get; set; }
+        public string ReportPdf { get; set; }
+        public string ReportError { get; set; }
+        public string ReportStorage { get; set; }
     }
 }
